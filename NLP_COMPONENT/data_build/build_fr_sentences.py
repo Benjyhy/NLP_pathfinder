@@ -29,5 +29,6 @@ for i in range(3000):
     full_sentence.strip()
     all_fr_sentences.append(full_sentence)
 
-with open("data/lang/fr.json", "a+", encoding="utf-8") as outfile:
-    json.dump(all_fr_sentences, outfile)
+for fr_sentence in all_fr_sentences:
+    with open("data/lang/fr.txt", "a+", encoding="utf-8") as outfile:
+        outfile.write(fr_sentence + "\n\n")
