@@ -18,6 +18,8 @@ def speech_analyze():
 
     try:
         print("Skynet thinks you said '" + result + "'")
+        with open('speech.txt', 'w'):
+            pass
         with open("speech.txt", "a") as file:
             file.write(result)
     except sr.UnknownValueError:
