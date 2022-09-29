@@ -23,9 +23,11 @@
     ]
   },
   "pipeline":[
+    "language_detector",
     "from_to_location"
   ],
   "components":[
+    "language_detector",
     "from_to_location"
   ],
   "disabled":[
