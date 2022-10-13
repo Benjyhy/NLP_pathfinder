@@ -1,0 +1,11 @@
+/.idea/.gitignore
+/PATH_FINDER/pathfinder.py
+/main.py
+/get_results_from_doc.py
+/.gitignore.html
+/.gitignore
+/.idea/.gitignore
+/PATH_FINDER/pathfinder.py
+/main.py
+/get_results_from_doc.py
+/README.md

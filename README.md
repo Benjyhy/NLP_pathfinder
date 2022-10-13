@@ -22,3 +22,10 @@ In this component, we will mainly use SpaCy, which is a library specialized in N
 The sentences used to feed the NER pipe were labelized using this [NER Annotator for Spacy tool](https://tecoholic.github.io/ner-annotator/).
   
 ## Path finder
+
+In this component, we mainly use *Networkxx* to build:
+- a `graph` from train stations we have in our dataset and also to create
+- ``edges`` which are distance between two train stations. After create graph and edges, we also added 
+- ``weight`` to our *edges* which is the duration of trip between two train stations. The *weight* facilitate the task to *Networkxx* to find a short path between two train stations in our dataset.
+
+To find a short path between two train stations, we use *Networkxx* function **shortest_path** which is a function implemented based on algorithm of *Dijkstra* by default.
