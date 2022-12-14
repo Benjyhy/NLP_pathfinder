@@ -1,0 +1,35 @@
+    # OPTIMUS
+    optimus_web:
+        build:
+            context: ../optimus/
+            network: host
+            args:
+                PIP_EXTRA_INDEX_URL: ${SECAASLIBS_PIPY_REGISTRY}
+        image: optimus
+        environment:
+            - APP_PATH=/usr/local/optimus
+            - APP_PORT=8006
+            - PIP_EXTRA_INDEX_URL=${SECAASLIBS_PIPY_REGISTRY}
+            - VAULT_ROLE_ID=${VAULT_ROLE_ID}
+            - VAULT_SECRET_ID=${VAULT_SECRET_ID}
+        command: "runserver"
+        volumes:
+            - ../optimus/optimus:/usr/local/optimus/
+            - databases:/usr/local/databases
+            - databases_tmp:/usr/local/databases_tmp
+        ports:
+            - "8006:8006"
+        mem_limit: 2048MB
+        depends_on:
+            - redis
+            - mongo
+            - mocker_web
+            - megatron_web
+            - salamander_web
+            - donkey_web
+            - octopus_web
+            - dromedary_web
+        networks:
+            main:
+                aliases:
+                    - optimus.web.lan
