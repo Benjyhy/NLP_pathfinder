@@ -1,4 +1,4 @@
 .env
 app/__pycache__
-venv
+app/venv/
 app/audio/*

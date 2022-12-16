@@ -3,12 +3,16 @@ import pickle
 import time
 from scipy.io.wavfile import read
 
-from main_functions import *
+from biometric_auth.main_functions import *
+
+audio_folder = os.environ.get("AUDIO_FOLDER")
+audio_voice_folder = os.environ.get("AUDIO_BIOMETRIC_VOICES_FOLDER")
+audio_model_folder = os.environ.get("AUDIO_BIOMETRIC_MODEL_FOLDER")
 
 def recognize(filename):
-    FILENAME = F"./{filename}.wav"
-    MODEL = "gmm_models/voice_auth.gmm"
-    VOICEPATH = "./voice_database/"
+    FILENAME = f"{audio_folder}{filename}.wav"
+    MODEL = f"{audio_model_folder}/voice_auth.gmm"
+    VOICEPATH = f"{audio_voice_folder}"
     VOICENAMES = [ name for name in os.listdir(VOICEPATH) if os.path.isdir(os.path.join(VOICEPATH, name)) ]
 
 
@@ -33,14 +37,9 @@ def recognize(filename):
 
     # if voice not recognized than terminate the process
     if identity == 'unknown':
-            print("Not Recognized! Try again...")
-            time.sleep(1.5)
-            os.system('cls' if os.name == 'nt' else 'clear')
-    
+        print("Not Recognized! Try again...")
+        return False
     
     print( "Recognized as - ", identity)
-    return
-            
-    
-if __name__ == '__main__':
-    recognize()
+    return identity
+        

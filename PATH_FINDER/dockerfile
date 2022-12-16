@@ -2,11 +2,11 @@ FROM python:3.8
 
 ENV PIP_ROOT_USER_ACTION=ignore
 
-RUN mkdir recognition
+RUN mkdir pathFinder
 
-COPY ./app /recognition/app
+COPY ./app /pathFinder/app
 
-WORKDIR /recognition
+WORKDIR /pathFinder
 
 RUN pip install --upgrade pip
 RUN pip install -r app/requirements.txt 

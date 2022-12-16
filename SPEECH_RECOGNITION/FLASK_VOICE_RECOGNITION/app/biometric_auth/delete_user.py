@@ -1,25 +1,26 @@
 import os 
 import pickle
 import glob
-from main_functions import *
+from biometric_auth.main_functions import *
 from scipy.io.wavfile import read
 
-# deletes a registered user from database
-def delete_user():
-    VOICEPATH = "voice_database/"
+audio_voice_folder = os.environ.get("AUDIO_BIOMETRIC_VOICES_FOLDER")
+audio_model_folder = os.environ.get("AUDIO_BIOMETRIC_MODEL_FOLDER")
 
-    name = input("Enter name of the user:")   
+# deletes a registered user from database
+def delete_user(name):
+    VOICEPATH = f"{audio_voice_folder}"
 
     users = [ name for name in os.listdir(VOICEPATH) if os.path.isdir(os.path.join(VOICEPATH, name)) ]
     
     if name not in users or name == "unknown":
-        print('No such user !!')
+        return False
 
     [os.remove(path) for path in glob.glob(VOICEPATH + name + '/*')]
     os.removedirs(VOICEPATH + name)
 
-    if os.path.isfile("gmm_models/voice_auth.gmm"): 
-        os.remove("gmm_models/voice_auth.gmm")
+    if os.path.isfile(f"{audio_model_folder}/voice_auth.gmm"): 
+        os.remove(f"{audio_model_folder}/voice_auth.gmm")
         
     voice_dir = [ name for name in os.listdir(VOICEPATH) if os.path.isdir(os.path.join(VOICEPATH, name)) ]
     X = []
@@ -45,13 +46,9 @@ def delete_user():
     clf = LogisticRegression(random_state=0).fit(X.tolist(), Y_trans)
 
 
-    if os.path.isfile("gmm_models/voice_auth.gmm"): 
-        os.remove("gmm_models/voice_auth.gmm")
+    if os.path.isfile(f"{audio_model_folder}/voice_auth.gmm"): 
+        os.remove(f"{audio_model_folder}/voice_auth.gmm")
     # saving model
-    pickle.dump(clf, open('gmm_models/voice_auth.gmm', 'wb'))
+    pickle.dump(clf, open(f"{audio_model_folder}/voice_auth.gmm", 'wb'))
 
-    print('User ' + name + ' deleted successfully')
-
-
-if __name__ == '__main__':
-    delete_user()
+    return 'User ' + name + ' deleted successfully'

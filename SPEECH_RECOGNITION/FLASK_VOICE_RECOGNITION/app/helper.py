@@ -18,6 +18,12 @@ def decode_and_create_audio(audio, username=''):
     wav_file.write(decode_string)
     return unique_filename
 
+def decode_and_create_audio_biometric(audio, ):
+    wav_file = open(f"{audio_folder}last_biometric_audio_tested.wav", "wb")
+    decode_string = base64.b64decode(audio)
+    wav_file.write(decode_string)
+    return 'last_biometric_audio_tested'
+
 def recognise(filename):
     r = sr.Recognizer()
     audio = sr.AudioFile(f'{audio_folder}{filename}.wav')

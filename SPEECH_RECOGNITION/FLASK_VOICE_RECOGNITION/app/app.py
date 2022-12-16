@@ -1,12 +1,20 @@
 from flask import Flask, jsonify, request, current_app
 from flask_cors import CORS, cross_origin
-from notion_client import Client, APIErrorCode, APIResponseError
 from functools import wraps
 from pprint import pprint as pp
 import jwt
 import os
-from helper import recognise, auth, decode_and_create_audio
+
+# Auth import
+from helper import *
 from biometric_auth.add_user import add_user
+from biometric_auth.recognize import recognize
+from biometric_auth.delete_user import delete_user
+
+# load env variable for production
+from dotenv import load_dotenv
+
+load_dotenv('.env')
 
 #env variables 
 user = os.environ.get("USER_AUTH")
@@ -31,7 +39,6 @@ def isAuthenticated(func):
             return {'message': 'No token provided'},400
         try:
             token = request.headers.get('Authorization')[7:]
-            print(secret)
             payload = jwt.decode(token, secret, algorithms=["HS256"], options={'verify_exp': False})
 
             if not payload["mdp"] == userMdp:
@@ -43,12 +50,11 @@ def isAuthenticated(func):
     return wrapper
 
 def generate_cookie():
-    encoded_jwt = jwt.encode({"user": user, "mdp" : userMdp}, os.environ.get('FLASK_SECRET_KEY'), algorithm="HS256").decode("utf-8")
+    encoded_jwt = jwt.encode({"user": user, "mdp" : userMdp}, secret, algorithm="HS256").decode("utf-8")
     print(encoded_jwt)
 
-
-
 @app.route("/recognise", methods=["POST"])
+@isAuthenticated
 def recognise_route():
     audio = request.get_json()["audio"]
     filename = decode_and_create_audio(audio)
@@ -57,6 +63,7 @@ def recognise_route():
     return jsonify(status=True, sentence=sentence)
 
 @app.route("/basicauth", methods=["POST"])
+@isAuthenticated
 def basicauth_route():
     audio = request.get_json()["audio"]
     filename = decode_and_create_audio(audio)
@@ -68,12 +75,13 @@ def basicauth_route():
         return jsonify(status=False, message="UnAuthorized")
 
 
-# Bioùetric Auth
+# Biometric Auth
 @app.route("/biometric/add", methods=["POST"])
+@isAuthenticated
 def biometric_add_route():
     audio = request.get_json()["audio"]
     username = request.get_json()["user"]
-    if os.path.exists(f"{audio_voice_folder}{user}"):
+    if os.path.exists(f"{audio_voice_folder}{username}"):
         return jsonify(status=False, message="User already exist")
     for file in audio:
         filename = decode_and_create_audio(file, username=username)
@@ -84,3 +92,25 @@ def biometric_add_route():
     else: 
         return jsonify(status=False)
 
+
+@app.route("/biometric/recognise", methods=["POST"])
+@isAuthenticated
+def biometric_recognise_route():
+    audio = request.get_json()["audio"]
+    filename = decode_and_create_audio_biometric(audio)
+    res = recognize(filename)
+    if res == False:
+        return jsonify(status=False)
+    else: 
+        return jsonify(status=True, identity=res)
+
+@app.route("/biometric/delete", methods=["POST"])
+@isAuthenticated
+def biometric_delete_route():
+    username = request.get_json()["user"]
+    if not os.path.exists(f"{audio_voice_folder}{username}"):
+        return jsonify(status=False, message="User not exist")
+    res = delete_user(username)
+    if res == False:
+        return jsonify(status=False, message="User not exist")
+    return jsonify(status=True, message=res)

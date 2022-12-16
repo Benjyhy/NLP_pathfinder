@@ -94,3 +94,13 @@ urllib3==1.26.12
 wasabi==0.10.1
 wcwidth==0.2.5
 webencodings==0.5.1
+Flask==2.1.3
+requests
+flask_cors
+notion-client
+pprintpp
+urllib3
+python-dotenv
+pyjwt
+gunicorn
+python-dotenv

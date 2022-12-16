@@ -2,11 +2,11 @@ FROM python:3.8
 
 ENV PIP_ROOT_USER_ACTION=ignore
 
-RUN mkdir recognition
+RUN mkdir nlp
 
-COPY ./app /recognition/app
+COPY ./app /nlp/app
 
-WORKDIR /recognition
+WORKDIR /nlp
 
 RUN pip install --upgrade pip
 RUN pip install -r app/requirements.txt 

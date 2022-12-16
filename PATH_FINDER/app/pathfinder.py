@@ -1,11 +1,8 @@
 import pandas as pd
 import numpy as np
 import networkx as nx
-import matplotlib.pyplot as plt
-import re
 
-datas = pd.read_csv('PATH_FINDER/timetables.csv', sep='\t')
-# print(datas.head())
+datas = pd.read_csv('timetables.csv', sep='\t')
 
 s = pd.Series(datas['trajet'])
 series = s.str.split(r" - ", expand=True)
@@ -42,10 +39,10 @@ def getAvailableShortPath(departure, destination):
     # inférieure ou égale à 3
 
     if departure == "" or len(departure) <= 3:
-        print("Désolé Madame/Monsieur, on n'a pas saisi votre lieu de départ, Pouvez-vous réessayer ultérieurement?")
+        return False
 
     elif destination == "" or len(destination) <= 3:
-        print("Désolé Madame/Monsieur, on n'a pas saisi votre lieu d'arrivée, Pouvez-vous réessayer ultérieurement?")
+        return False
     # verifier si le mot inséré est contenue dans l'une des gares qu'on a dans le dataset
 
     else:
@@ -53,7 +50,7 @@ def getAvailableShortPath(departure, destination):
         depart, arrivee = checkDestination(departure, destination, departure_list, destination_list)
 
         if len(depart)==0 or len(arrivee)==0:
-            print("Désolé Madame/Monsieur, nous n'avons aucun trajet correspondant à votre demande!")
+            return 0
 
         for k in depart:
             for l in arrivee:
