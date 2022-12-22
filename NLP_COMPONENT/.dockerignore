@@ -1,0 +1,4 @@
+app/data/
+app/data_build/
+app/venv/
+app/__pycache__/

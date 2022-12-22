@@ -1,4 +1,0 @@
-
-
-def interpret_text():
-    
