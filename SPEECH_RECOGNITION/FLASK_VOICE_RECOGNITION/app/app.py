@@ -60,10 +60,11 @@ def recognise_route():
     filename = decode_and_create_audio(audio)
 
     sentence = recognise(filename)
+    if(sentence == False):
+        return jsonify(status=False)
     return jsonify(status=True, sentence=sentence)
 
 @app.route("/basicauth", methods=["POST"])
-@isAuthenticated
 def basicauth_route():
     audio = request.get_json()["audio"]
     filename = decode_and_create_audio(audio)
@@ -94,7 +95,6 @@ def biometric_add_route():
 
 
 @app.route("/biometric/recognise", methods=["POST"])
-@isAuthenticated
 def biometric_recognise_route():
     audio = request.get_json()["audio"]
     filename = decode_and_create_audio_biometric(audio)
@@ -102,7 +102,7 @@ def biometric_recognise_route():
     if res == False:
         return jsonify(status=False)
     else: 
-        return jsonify(status=True, identity=res)
+        return jsonify(status=True, identity=res, token=token)
 
 @app.route("/biometric/delete", methods=["POST"])
 @isAuthenticated
