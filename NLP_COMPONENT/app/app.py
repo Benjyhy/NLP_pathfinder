@@ -75,6 +75,7 @@ def recommendation_route():
     nlp = spacy.load(f"{nlp_folder}")
     doc = nlp(speech)
     results = get_results_from_doc(doc)
+    print(results)
     return jsonify(status=True, result=results)
 
 

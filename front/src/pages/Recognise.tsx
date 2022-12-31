@@ -97,6 +97,7 @@ export const Recognise = () => {
     // AUDIO SENTENCE
     const audio: string = await blobToBase64(recorderState.audio!);
     const speechRes = await sendAudioSpeech(audio);
+    console.log(speechRes)
     if (!speechRes?.data.status) {
       setNotif({
         content: 'Something went wrong with the vocal recognition',
@@ -112,13 +113,13 @@ export const Recognise = () => {
     console.log(nlpRes);
     if (!nlpRes?.data.status) {
       setNotif({
-        content: 'Something went wrong in pathFinder',
+        content: 'Something went wrong in sentence recognition',
         type: DANGER,
       });
       setInfo(<></>);
       return setLoader(false);
     }
-    if (Object.keys(nlpRes?.data.result).length === 0) {
+    if (!nlpRes?.data.result.hasOwnProperty("from") || !nlpRes?.data.result.hasOwnProperty("to") ) {
       setNotif({
         content: 'Could not recognise the departure and destination',
         type: DANGER,
