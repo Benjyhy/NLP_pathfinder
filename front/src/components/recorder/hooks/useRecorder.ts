@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { startRecording, saveRecording } from '../handlers';
 import { Recorder, Interval, AudioTrack, MediaRecorderEvent } from '../types';
 
-const initialState: Recorder = {
+export const initialState: Recorder = {
   recordingSeconds: 0,
   initRecording: false,
   mediaStream: undefined,

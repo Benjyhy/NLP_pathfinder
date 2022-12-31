@@ -12,15 +12,18 @@ export default function RecorderControls({
   info,
   handleRecording,
   disableRecord,
+  title,
+  allowStopAudio,
 }: RecorderControlsProps) {
   const { recordingSeconds, initRecording } = recorderState;
   const { saveRecording } = handlers;
+
   return (
     <>
       {!disableRecord && <></>}
       {disableRecord && (
         <>
-          <h1>Record an audio</h1>
+          <h1>{title}</h1>
           <Flex
             flexDirection='row'
             justifyContent='space-between'
@@ -32,7 +35,7 @@ export default function RecorderControls({
               <span>{formatSeconds(recordingSeconds)}</span>
             </Box>
             <Box style={{ color: '#fff' }}>{info}</Box>
-            {initRecording ? (
+            {allowStopAudio && initRecording && (
               <RoundedButton
                 width={35}
                 title='Stop recording'
@@ -40,16 +43,21 @@ export default function RecorderControls({
               >
                 <CloseIcon />
               </RoundedButton>
-            ) : (
+            )}
+            {!initRecording && (
               <Box>
-                <RoundedButton
-                  width={35}
-                  title='Start recording'
-                  onClick={handleRecording}
-                  disabled={info.props.length === 0 && true}
-                >
-                  <MicrophoneIcon />
-                </RoundedButton>
+                {Object.keys(info.props).length === 0 ? (
+                  <RoundedButton
+                    width={35}
+                    title='Start recording'
+                    onClick={handleRecording}
+                    disabled={info.props.length === 0 && true}
+                  >
+                    <MicrophoneIcon />
+                  </RoundedButton>
+                ) : (
+                  <Box></Box>
+                )}
               </Box>
             )}
           </Flex>

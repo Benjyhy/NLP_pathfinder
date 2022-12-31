@@ -1,4 +1,5 @@
 import { SetRecordings, SetRecorder } from './types';
+import { initialState } from './hooks/useRecorder';
 
 export async function startRecording(setRecorderState: SetRecorder) {
   try {
@@ -28,6 +29,15 @@ export async function AskForMicrophone() {
   } catch (err) {
     return false;
   }
+}
+
+export function resetRecording(setRecorderState: SetRecorder) {
+  setRecorderState(prevState => {
+    return {
+      ...prevState,
+      initialState,
+    };
+  });
 }
 
 export function saveRecording(recorder: any) {

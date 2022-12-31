@@ -18,8 +18,12 @@ export interface INotif {
   content?: string | undefined;
   type: typeof PRIMARY_1 | typeof DANGER | typeof WARNING | undefined;
 }
+
+export const NotifDefaultState = {
+  content: undefined,
+  type: undefined,
+};
 export const Notif = ({ content, type }: INotif) => {
-  console.log(type);
   const [show, setShow] = useState<boolean>(false);
 
   useEffect(() => {

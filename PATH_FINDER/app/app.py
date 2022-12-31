@@ -58,17 +58,16 @@ def pathFinder_route():
     paths_list = getAvailableShortPath(departure, arrival)
 
     if paths_list == False:
-        return "Désolé Madame/Monsieur, on n'a pas saisi votre lieu de départ, Pouvez-vous réessayer ultérieurement?"
+        return jsonify(status=True, message="not found")
     if paths_list == 0:
-        return "Désolé Madame/Monsieur, nous n'avons aucun trajet correspondant à votre demande!"
-    paths = " ---> ".join(paths_list)
+        return jsonify(status=False, message="no trip" )
     time = getTimeToReachDestination(departure, arrival)
 
     hours = time // 60
     minutes = time % 60
     time_string = "{} hrs {} mins".format(hours, minutes)
 
-    return jsonify(status=True, message=f"Bonjour Madame/ Monsieur, Pour aller à {arrival},il vous faudra faire {paths} et cela vous prendra à peu près {time_string} d'après les trajets disponibles.")
+    return jsonify(status=True, paths=paths_list, time=time_string)
 
 
 

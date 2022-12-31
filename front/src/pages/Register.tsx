@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import useRecorder from '../components/recorder/hooks/useRecorder';
 import useRecordingsList from '../components/recorder/hooks/useRecordingsList';
 import RecorderControls from '../components/recorder/Recording';
@@ -6,32 +6,39 @@ import RecordingsList from '../components/recorder/recordingList';
 import Button from '../components/Button';
 import AudioRefused from '../components/AudioRefused';
 import { Flex, Box } from 'reflexbox';
-import { Back } from '../components/Back';
+import { Layout } from '../components/Layout';
 import { AskForMicrophone } from '../components/recorder/handlers';
-import { UseRecorder } from '../components/recorder/types';
+import { Audio, UseRecorder } from '../components/recorder/types';
 import { WARNING, PRIMARY_1, DANGER } from '../constants/style';
 import { blobToBase64 } from '../helper/Utils';
-import axios from 'axios';
-import { sendSpeech } from '../helper/Service';
+import { addUser } from '../helper/Service';
 import Loader from '../components/Loader';
-import { INotif, Notif } from '../components/Notif';
+import { INotif, Notif, NotifDefaultState } from '../components/Notif';
+import Input from '../components/Input';
+import { useNavigate } from 'react-router-dom';
 
 export const Register = () => {
-  const [auth, setAuth] = useState<boolean>(true);
-  // AskForMicrophone().then(res => {
-  //   if (res === true) setAuth(true);
-  // });
+  const navigate = useNavigate();
+  const [auth, setAuth] = useState<boolean>(false);
+  AskForMicrophone().then(res => {
+    if (res === true) setAuth(true);
+  });
 
   const { recorderState, ...handlers }: UseRecorder = useRecorder();
   const { recordings, deleteAudio } = useRecordingsList(recorderState.audio);
 
   const [info, setInfo] = useState<JSX.Element>(<></>);
+  const user = useRef<HTMLInputElement | null>(null);
   const [loader, setLoader] = useState<boolean>(false);
-  const [disableRecord, setDisableRecord] = useState<boolean>(false);
-  const [notif, setNotif] = useState<INotif>({
-    content: undefined,
-    type: undefined,
-  });
+  const [notif, setNotif] = useState<INotif>(NotifDefaultState);
+
+  useEffect(() => {
+    if (notif != undefined) {
+      setTimeout(() => {
+        setNotif(NotifDefaultState);
+      }, 1500);
+    }
+  }, [notif]);
 
   const handleRecording = () => {
     // let seconds = 3;
@@ -55,23 +62,45 @@ export const Register = () => {
     //     handlers.startRecording();
     //   }
     // }, 2000);
-
     handlers.startRecording();
   };
 
   const handleSubmit = async () => {
     setLoader(true);
-    const audio: string = await blobToBase64(recordings[0].audio);
-    const speechRes = await sendSpeech(audio);
-    setLoader(false);
-    if (!speechRes?.data.status)
-      return setNotif({ content: 'Sometging went wrong', type: DANGER });
+    if (user.current?.value.length === 0) {
+      setNotif({ content: 'Name can not be empty', type: DANGER });
+      setLoader(false);
+      return;
+    }
+    const audio: string[] = [];
+    const username = user.current?.value;
+    await Promise.all(
+      recordings.map(async (record: Audio) => {
+        audio.push(await blobToBase64(record.audio));
+      }),
+    );
 
-    setNotif({ content: 'Sometging went wrong', type: PRIMARY_1 });
+    const registerRes = await addUser(audio, username!);
+    console.log(registerRes);
+    if (!registerRes?.data.status) {
+      if (registerRes?.data.message) {
+        setNotif({ content: 'User already exist', type: DANGER });
+      } else {
+        setNotif({ content: 'Unauthorized', type: DANGER });
+      }
+      handlers.cancelRecording();
+      setLoader(false);
+      setInfo(<></>);
+      return;
+    }
+    setNotif({ content: `${username} has been added`, type: PRIMARY_1 });
+    setTimeout(() => {
+      navigate('/login');
+    }, 1500);
   };
 
   useEffect(() => {
-    if (recorderState.recordingSeconds === 4) {
+    if (recorderState.recordingSeconds === 2) {
       handlers.saveRecording();
       setInfo(<></>);
     }
@@ -79,31 +108,37 @@ export const Register = () => {
 
   return (
     <>
-      <Back />
+      <Layout />
       {!auth && <AudioRefused />}
+      <Notif content={notif.content} type={notif.type} />
       {!loader && (
         <>
-          <Notif content={notif.content} type={notif.type} />
           <Flex width='70vw' flexDirection='column'>
+            <h1>Register a new user</h1>
+            <Box py='4'>
+              <Input placeholder='Joris' refValue={user} />
+            </Box>
             <RecorderControls
+              title=''
               recorderState={recorderState}
               handlers={handlers}
               handleRecording={handleRecording}
               info={info}
-              disableRecord={disableRecord}
+              disableRecord={recordings.length < 3 && true}
+              allowStopAudio={false}
             />
             <RecordingsList recordings={recordings} deleteAudio={deleteAudio} />
 
-            {recordings?.length !== 0 && (
+            {recordings?.length === 3 && (
               <Flex
                 py='4'
                 flexDirection='column'
                 justifyContent='center'
                 alignItems='center'
               >
-                <span>Dont forget to check if your audio is correct</span>
+                <span>Dont forget to check if your audios is correct</span>
                 <Button
-                  content={'Envoyer votre audio'}
+                  content={'Send'}
                   color={PRIMARY_1}
                   click={handleSubmit}
                 />

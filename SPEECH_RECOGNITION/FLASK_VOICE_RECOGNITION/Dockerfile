@@ -9,6 +9,7 @@ RUN apt-get -y upgrade
 RUN apt-get install -y ffmpeg
 
 COPY ./app /recognition/app
+COPY ./.env /recognition/app
 
 WORKDIR /recognition
 

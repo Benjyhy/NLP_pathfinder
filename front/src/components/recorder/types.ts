@@ -16,15 +16,17 @@ export type UseRecorder = {
 };
 
 export type RecorderControlsProps = {
+  title: string;
+  allowStopAudio?: boolean;
   recorderState: Recorder;
   info: JSX.Element;
   disableRecord: boolean;
+  handleRecording: () => void;
   handlers: {
     startRecording: () => void;
     cancelRecording: () => void;
     saveRecording: () => void;
   };
-  handleRecording: () => void;
 };
 
 export type RecordingsListProps = {

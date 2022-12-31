@@ -36,7 +36,6 @@ export const GlobalStyles = createGlobalStyle`
   body {
     margin: 0 auto;
     font-family: var(--font-main);
-    background-color: var(--white);
     color: var(--black);
     max-width: var(--max-width);
     background: #1b1c21

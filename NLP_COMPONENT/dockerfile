@@ -5,6 +5,7 @@ ENV PIP_ROOT_USER_ACTION=ignore
 RUN mkdir nlp
 
 COPY ./app /nlp/app
+COPY ./.env /nlp/app
 
 WORKDIR /nlp
 
