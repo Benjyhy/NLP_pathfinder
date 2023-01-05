@@ -81,21 +81,34 @@ export const Login = () => {
     };
   }, [handleRecorderState]);
 
-  useEffect(() => {
-    if (recorderState.audio !== null && isBiometricAuth === false) {
-      handleSubmit();
-    }
+  // useEffect(() => {
+  //   if (recorderState.audio !== null && isBiometricAuth === false) {
+  //     handleSubmit();
+  //   }
 
-    if (recorderState.recordingSeconds === 3 && isBiometricAuth === true) {
-      handlers.saveRecording();
-      handleSubmit();
-    }
-  }, [recorderState]);
+  //   if (recorderState.recordingSeconds === 3 && isBiometricAuth === true) {
+  //     handlers.saveRecording();
+  //     handleSubmit();
+  //   }
+  // }, [recorderState]);
+
+  if(isBiometricAuth) {
+    useEffect(() => {
+     if(recorderState.recordingSeconds === 3) {
+      handlers.saveRecording()
+     }
+    }, [recorderState.recordingSeconds])
+  } 
+  useEffect(() => {
+  if(recorderState.audio !== null) {
+      handleSubmit()
+     }
+    }, [recorderState.audio])
+  
 
   const handleSubmit = async () => {
     setLoader(true);
     const audio: string = await blobToBase64(recorderState.audio!);
-
     const authRes = isBiometricAuth
       ? await biometricAuth(audio)
       : await basicAuth(audio);

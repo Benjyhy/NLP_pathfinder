@@ -2,6 +2,9 @@ import speech_recognition as sr
 import os
 import uuid
 import base64
+import librosa
+import soundfile as sf
+
 
 # load env variable for production
 from dotenv import load_dotenv
@@ -12,16 +15,20 @@ audio_voice_folder = os.environ.get("AUDIO_BIOMETRIC_VOICES_FOLDER")
 
 def convertMp3ToWav(filename, username=False):
     if username != False:  
-        os.system(f"ffmpeg -i {audio_voice_folder}{username}/{filename}.mp3 {audio_voice_folder}{username}/{filename}.wav")
+        os.system(f"yes yes | ffmpeg -i {audio_voice_folder}{username}/{filename}.mp3 {audio_voice_folder}{username}/{filename}.wav")
         os.remove(f"{audio_voice_folder}{username}/{filename}.mp3")
     else:
-        os.system(f"ffmpeg -i {audio_folder}{filename}.mp3 {audio_folder}{filename}.wav ")
+        os.system(f"ffmpeg -i {audio_folder}{filename}.mp3 {audio_folder}{filename}.wav")
         os.remove(f"{audio_folder}{filename}.mp3")
+        data, sr = librosa.load(f"{audio_folder}{filename}.wav", sr=None, mono=False)
+        trimmed = librosa.util.fix_length(data, int(sr * 2))
+        sf.write(f"{audio_folder}{filename}.wav", trimmed, 44100)
 
 def decode_and_create_audio(audio, username=''):
     unique_filename = str(uuid.uuid4())
     decode_string = base64.b64decode(audio)
     if not username:
+        print("in")
         wav_file = open(f"{audio_folder}{unique_filename}.mp3", "wb")
         wav_file.write(decode_string)
         convertMp3ToWav(unique_filename)
@@ -33,7 +40,7 @@ def decode_and_create_audio(audio, username=''):
         convertMp3ToWav(unique_filename, username)
     return unique_filename
 
-def decode_and_create_audio_biometric(audio, ):
+def decode_and_create_audio_biometric_recognize(audio):
     wav_file = open(f"{audio_folder}last_biometric_audio_tested.mp3", "wb")
     decode_string = base64.b64decode(audio)
     wav_file.write(decode_string)

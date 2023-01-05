@@ -101,7 +101,7 @@ def biometric_add_route():
 @app.route("/biometric/recognise", methods=["POST"])
 def biometric_recognise_route():
     audio = request.get_json()["audio"]
-    filename = decode_and_create_audio_biometric(audio)
+    filename = decode_and_create_audio_biometric_recognize(audio)
     res = recognize(filename)
     if res == False:
         return jsonify(status=False)

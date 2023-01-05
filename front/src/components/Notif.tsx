@@ -9,7 +9,7 @@ import styled from 'styled-components';
 const Styled = styled(Flex)`
   position: fixed;
   top: 30px;
-  z-index: 99;
+  z-index: 99999;
   border: 2px solid transparent;
   transition: all 0.3s;
 `;
