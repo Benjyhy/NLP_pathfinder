@@ -22,3 +22,11 @@ services:
     command: bash -c "cd /pathFinder/app && gunicorn --bind 0.0.0.0:5000 wsgi:app"
     ports:
         - 5003:5000
+  app:
+    container_name: app
+    build:
+      context: ./front
+    tty: true
+    command: sh -c "serve -s ./dist"
+    ports:
+      - 3001:3000

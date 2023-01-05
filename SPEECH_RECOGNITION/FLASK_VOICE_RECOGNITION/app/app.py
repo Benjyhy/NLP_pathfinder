@@ -60,19 +60,24 @@ def recognise_route():
     filename = decode_and_create_audio(audio)
 
     sentence = recognise(filename)
+    if(sentence == False):
+        return jsonify(status=False)
     return jsonify(status=True, sentence=sentence)
 
 @app.route("/basicauth", methods=["POST"])
-@isAuthenticated
 def basicauth_route():
     audio = request.get_json()["audio"]
     filename = decode_and_create_audio(audio)
 
-    sentence = auth(filename)
-    if sentence:
-        return jsonify(status=True, token=token)
-    else: 
-        return jsonify(status=False, message="UnAuthorized")
+    res = auth(filename)
+    if res["status"] == True:
+        return jsonify(status=True, user=res["user"])
+
+    if res["failed"] == True:
+        return jsonify(status=False, failed=True)
+    
+    if res["failed"] == False:
+        return jsonify(status=False, failed=False)
 
 
 # Biometric Auth
@@ -84,9 +89,9 @@ def biometric_add_route():
     if os.path.exists(f"{audio_voice_folder}{username}"):
         return jsonify(status=False, message="User already exist")
     for file in audio:
-        filename = decode_and_create_audio(file, username=username)
+        decode_and_create_audio(file, username=username)
 
-    res = add_user(filename)
+    res = add_user(username)
     if res:
         return jsonify(status=True)
     else: 
@@ -94,23 +99,22 @@ def biometric_add_route():
 
 
 @app.route("/biometric/recognise", methods=["POST"])
-@isAuthenticated
 def biometric_recognise_route():
     audio = request.get_json()["audio"]
-    filename = decode_and_create_audio_biometric(audio)
+    filename = decode_and_create_audio_biometric_recognize(audio)
     res = recognize(filename)
     if res == False:
         return jsonify(status=False)
     else: 
-        return jsonify(status=True, identity=res)
+        return jsonify(status=True, user=res, token=token)
 
 @app.route("/biometric/delete", methods=["POST"])
 @isAuthenticated
 def biometric_delete_route():
     username = request.get_json()["user"]
     if not os.path.exists(f"{audio_voice_folder}{username}"):
-        return jsonify(status=False, message="User not exist")
+        return jsonify(status=False, message=f"User {username} not exist")
     res = delete_user(username)
     if res == False:
-        return jsonify(status=False, message="User not exist")
+        return jsonify(status=False, message=f"User {username} not exist")
     return jsonify(status=True, message=res)

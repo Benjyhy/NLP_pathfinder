@@ -1,9 +1,13 @@
 import os
 import pickle
-import time
 from scipy.io.wavfile import read
 
 from biometric_auth.main_functions import *
+
+# load env variable for production
+from dotenv import load_dotenv
+
+load_dotenv('.env')
 
 audio_folder = os.environ.get("AUDIO_FOLDER")
 audio_voice_folder = os.environ.get("AUDIO_BIOMETRIC_VOICES_FOLDER")

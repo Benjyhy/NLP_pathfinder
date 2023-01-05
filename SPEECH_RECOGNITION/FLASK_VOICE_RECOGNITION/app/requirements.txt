@@ -7,6 +7,7 @@ python-dotenv
 pyjwt
 gunicorn
 python-dotenv
+librosa
 SpeechRecognition==3.8.1
 absl-py==0.9.0
 astor==0.8.1
